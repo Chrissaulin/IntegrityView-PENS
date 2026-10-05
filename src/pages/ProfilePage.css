@@ -1,0 +1,178 @@
+.pf-shell {
+  max-width: 960px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-grid);
+}
+
+/* === Hero identitas === */
+.pf-hero {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: var(--white);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-soft);
+  padding: 24px 28px;
+  position: relative;
+  overflow: hidden;
+}
+.pf-hero::after {
+  content: '';
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: var(--orange-100);
+  opacity: 0.5;
+}
+.pf-hero__avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--navy-900);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  z-index: 1;
+  border: 3px solid var(--orange-500);
+}
+.pf-hero__main { flex: 1; min-width: 0; z-index: 1; }
+.pf-hero__name {
+  font-family: var(--font-display);
+  font-size: clamp(1.3rem, 2.4vw, 1.7rem);
+  letter-spacing: -0.02em;
+  margin-top: 4px;
+}
+.pf-hero__meta { color: var(--text-secondary); font-size: 0.9rem; margin-top: 4px; }
+.pf-hero__keluar { z-index: 1; flex-shrink: 0; }
+
+/* === Statistik === */
+.pf-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--gap-grid);
+}
+.pf-stat {
+  background: var(--white);
+  border: 1px solid var(--border-soft);
+  border-radius: 18px;
+  box-shadow: var(--shadow-soft);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.pf-stat__value {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.pf-stat__value--ok { color: var(--teal-500); }
+.pf-stat__of { font-size: 15px; color: var(--text-secondary); font-weight: 700; }
+.pf-stat__label { font-size: 11.5px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-secondary); }
+
+/* === Grid dua kolom === */
+.pf-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--gap-grid);
+  align-items: start;
+}
+.pf-card {
+  background: var(--white);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-soft);
+  padding: 22px 24px;
+}
+.pf-card__title { font-family: var(--font-display); font-size: 1.05rem; margin-bottom: 16px; }
+
+.pf-dl { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+.pf-dl li { display: grid; grid-template-columns: 130px 1fr; gap: 12px; font-size: 13.5px; color: var(--text-primary); }
+.pf-dl li span:first-child { color: var(--text-secondary); font-weight: 600; font-size: 12.5px; }
+.pf-dl li span:last-child { word-break: break-word; }
+
+/* === Tabs dalam kartu === */
+.pf-card__tabs {
+  display: inline-flex;
+  gap: 4px;
+  background: var(--bg-page);
+  border: 1px solid var(--border-soft);
+  padding: 4px;
+  border-radius: var(--radius-pill);
+  margin-bottom: 18px;
+}
+.pf-card__tab {
+  padding: 7px 16px;
+  border-radius: var(--radius-pill);
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.pf-card__tab.is-active { background: var(--navy-900); color: #fff; }
+
+/* === Aktivitas === */
+.pf-aktivitas { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 4px; }
+.pf-aktivitas li {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-soft);
+}
+.pf-aktivitas li:last-child { border-bottom: 0; }
+.pf-aktivitas__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--orange-500);
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+.pf-aktivitas__teks { font-size: 13.5px; font-weight: 600; color: var(--text-primary); }
+.pf-aktivitas__waktu { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+/* === Info keamanan === */
+.pf-info { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+.pf-info li {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  padding-left: 14px;
+  position: relative;
+}
+.pf-info li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 7px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--orange-500);
+}
+.pf-info strong { color: var(--text-primary); }
+
+.pf-empty { font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; }
+
+@media (max-width: 900px) {
+  .pf-grid { grid-template-columns: 1fr; }
+  .pf-stats { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 560px) {
+  .pf-hero { flex-wrap: wrap; }
+  .pf-dl li { grid-template-columns: 110px 1fr; }
+}

@@ -1,0 +1,135 @@
+.topbar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 24px;
+  align-items: center;
+  padding: 20px 28px 12px;
+  background: var(--bg-page);
+}
+
+.topbar__greeting {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.topbar__wave { font-size: 20px; }
+
+.topbar__sub {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.topbar__search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-pill);
+  padding: 10px 18px;
+  max-width: 480px;
+  color: var(--text-secondary);
+}
+.topbar__search input {
+  border: 0;
+  outline: 0;
+  background: transparent;
+  flex: 1;
+  font-size: 13.5px;
+  color: var(--text-primary);
+}
+.topbar__search input::placeholder { color: var(--gray-500); }
+
+.topbar__right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.topbar__clock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.2;
+}
+.topbar__clock-time {
+  font-weight: 800;
+  font-size: 15px;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.topbar__clock-date {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.topbar__notif {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  display: grid;
+  place-items: center;
+  color: var(--text-primary);
+  transition: box-shadow 0.15s ease;
+}
+.topbar__notif:hover { box-shadow: var(--shadow-hover); }
+
+.topbar__notif-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  background: var(--orange-500);
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 800;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: var(--radius-pill);
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--bg-page);
+}
+
+.topbar__cta { padding: 10px 20px; font-size: 13.5px; }
+
+.topbar__avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--navy-900);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--orange-500);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.topbar__avatar:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(11, 27, 51, 0.2);
+}
+
+@media (max-width: 1100px) {
+  .topbar { grid-template-columns: 1fr auto; }
+  .topbar__center { order: 3; grid-column: 1 / -1; }
+  .topbar__clock { display: none; }
+}
+
+@media (max-width: 720px) {
+  .topbar { padding: 14px 16px 8px; gap: 12px; }
+  .topbar__right .chip { display: none; }
+  .topbar__cta { display: none; }
+  .topbar__greeting { font-size: 18px; }
+  .topbar__sub { font-size: 12px; }
+}

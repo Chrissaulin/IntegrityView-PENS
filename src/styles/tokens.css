@@ -1,0 +1,47 @@
+:root {
+  /* === Warna inti brand === */
+  --navy-900: #0B1B33;
+  --navy-800: #112238;
+  --navy-700: #13284A;
+  --navy-600: #1F3A5C;
+  --navy-500: #1E3A5F;
+
+  --orange-500: #F5843C;
+  --orange-400: #F79455;
+  --orange-100: #FDE7D7;
+
+  --white: #FFFFFF;
+  --gray-50:  #F5F6F8;
+  --gray-200: #E4E7EC;
+  --gray-500: #6B7280;
+
+  /* === Aksen === */
+  --teal-500: #2FB8A6;
+  --error-500: #DC4C4C;
+
+  /* === Token turunan — Light Theme === */
+  --bg-page:        #F5F6F8;
+  --bg-card:        #FFFFFF;
+  --border-soft:    #DCE4F0;
+  --text-primary:   #0B1B33;
+  --text-secondary: #6B7280;
+  --text-on-dark:   #F1F4F9;
+  --text-on-orange: #FFFFFF;
+
+  /* === Bentuk & bayangan === */
+  --radius-card: 24px;
+  --radius-pill: 999px;
+  --shadow-soft:  0 1px 3px rgba(16, 24, 40, 0.06);
+  --shadow-hover: 0 10px 24px rgba(16, 24, 40, 0.10);
+
+  /* === Spacing === */
+  --space-card: 22px;
+  --gap-grid: 18px;
+
+  /* === Sidebar === */
+  --sidebar-w: 76px;
+
+  /* === Typography === */
+  --font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Sora', 'Plus Jakarta Sans', system-ui, sans-serif;
+}
