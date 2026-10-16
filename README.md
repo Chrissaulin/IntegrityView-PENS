@@ -1,12 +1,13 @@
-# IntegrityView — frontend2 (Bento Dashboard Theme)
+# IntegrityView — Frontend (Bento Dashboard Theme)
 
 Theme 2 dari IntegrityView: dashboard + landing page dengan bahasa visual **bento grid** (kartu rounded-24, blob dekoratif, sidebar ikon gelap, aksen oranye brand).
 
-Stack: **React 19 + Vite**, vanilla CSS dengan CSS variables (`src/styles/tokens.css`).
+Stack: **React 19 + Vite**, vanilla CSS dengan CSS variables (`frontend/src/styles/tokens.css`).
 
 ## Jalankan
 
 ```bash
+cd frontend
 npm install
 npm run dev
 ```
@@ -16,6 +17,7 @@ Buka URL yang muncul (default `http://localhost:5173`).
 ## Build
 
 ```bash
+cd frontend
 npm run build
 npm run preview
 ```
@@ -23,36 +25,21 @@ npm run preview
 ## Struktur
 
 ```
-frontend2/
-├── index.html
-├── public/
-│   └── pens.jpeg                 <- hero landing (dari frontend/assets/img)
-├── src/
-│   ├── styles/
-│   │   ├── tokens.css            <- CSS variables warna §2 DESIGN2.md
-│   │   └── globals.css
-│   ├── components/
-│   │   ├── layout/
-│   │   │   ├── Sidebar.jsx       <- icon-only, tooltip on-hover
-│   │   │   ├── Topbar.jsx        <- greeting personal, search, jam live
-│   │   │   └── BentoGrid.jsx     <- 12 kolom grid + span helper
-│   │   ├── cards/
-│   │   │   ├── StatCard.jsx      <- kartu putih / navy + blob
-│   │   │   ├── HighlightCard.jsx <- kartu oranye solid (CTA)
-│   │   │   ├── SoftStatCard.jsx  <- kartu peach progress bar
-│   │   │   ├── ChartCard.jsx     <- line chart SVG + tooltip hover
-│   │   │   ├── AddNewCard.jsx    <- dashed "tambah survei"
-│   │   │   └── cards.css
-│   │   └── tables/
-│   │       └── ReportsTable.jsx  <- filter status, sort, klik-detail
-│   ├── pages/
-│   │   ├── LandingPage.jsx       <- hero foto + mini bento preview
-│   │   └── Dashboard.jsx         <- bento interaktif (2 mode view)
-│   ├── data/
-│   │   └── mock.js               <- data simulasi
-│   ├── App.jsx
-│   └── main.jsx
-└── README.md
+.
+├── .gitignore
+├── README.md
+└── frontend/
+    ├── .oxlintrc.json
+    ├── index.html
+    ├── package.json
+    ├── package-lock.json
+    ├── vite.config.js
+    ├── public/
+    └── src/
+        ├── components/
+        ├── data/
+        ├── pages/
+        └── styles/
 ```
 
 ## Interaksi Dashboard
