@@ -1,7 +1,9 @@
 import { useMemo, useState } from 'react';
 import Sidebar from '../components/layout/Sidebar';
 import Topbar from '../components/layout/Topbar';
-import { getDaftarSurvei, getUser, jumlahTerisi, sudahDiisi, SURVEI_INFO } from '../data/mock';
+import { SURVEI_DESKRIPSI, SURVEI_LANGKAH, getUser, jumlahTerisi, sudahDiisi } from '../data/mock';
+import { getReportData } from '../data/reportData';
+import { useReportFilters } from '../data/useReportFilters';
 import './SurveiPage.css';
 
 const KATEGORI = ['Semua', 'Integritas & Korupsi', 'Pelayanan Publik', 'Pelaporan', 'Budaya & 5R'];
@@ -10,18 +12,24 @@ export default function SurveiPage({ onNavigate, onIsiSurvei }) {
   const user = getUser();
   const [kategori, setKategori] = useState('Semua');
 
-  const daftar = useMemo(() => getDaftarSurvei(), []);
+  const { filter } = useReportFilters();
+  const laporan = useMemo(() => getReportData({ ...filter, kategori: 'Semua' }), [filter]);
+  const daftar = useMemo(() => laporan.instrumen.map(({ info, aktif }) => ({
+    ...info,
+    deskripsi: SURVEI_DESKRIPSI[info.key] || '',
+    langkah: SURVEI_LANGKAH[info.key],
+    jumlahButir: aktif?.butir.length || 0,
+    responden: aktif?.jumlahResponden || 0
+  })), [laporan]);
   const terisi = useMemo(() => jumlahTerisi(), []);
+  /* Jumlah instrumen & responden dari sumber yang sama dengan dashboard. */
+  const jumlahInstrumen = daftar.length;
+  const totalResponden = laporan.ringkasan.responden.total;
 
   const filtered = useMemo(() => {
     if (kategori === 'Semua') return daftar;
     return daftar.filter((d) => d.kategori === kategori);
   }, [daftar, kategori]);
-
-  const totalResponden = useMemo(
-    () => daftar.reduce((a, d) => a + d.responden, 0),
-    [daftar]
-  );
 
   const handleMenu = (key) => {
     if (onNavigate) onNavigate(key);
@@ -51,11 +59,11 @@ export default function SurveiPage({ onNavigate, onIsiSurvei }) {
 
             <div className="survei-hero__progress">
               <div className="survei-hero__progress-num">
-                {terisi}<span className="survei-hero__progress-of"> / {SURVEI_INFO.length}</span>
+                {terisi}<span className="survei-hero__progress-of"> / {jumlahInstrumen}</span>
               </div>
               <p className="survei-hero__progress-label">Survei sudah diisi</p>
-              <div className="survei-hero__progress-bar" role="progressbar" aria-valuenow={terisi} aria-valuemin="0" aria-valuemax={SURVEI_INFO.length}>
-                <span style={{ width: (terisi / SURVEI_INFO.length) * 100 + '%' }} />
+              <div className="survei-hero__progress-bar" role="progressbar" aria-valuenow={terisi} aria-valuemin="0" aria-valuemax={jumlahInstrumen}>
+                <span style={{ width: (terisi / jumlahInstrumen) * 100 + '%' }} />
               </div>
               <p className="survei-hero__progress-note">Hanya menghitung form internal di peramban ini.</p>
             </div>
@@ -63,7 +71,7 @@ export default function SurveiPage({ onNavigate, onIsiSurvei }) {
 
           <section className="survei-stats">
             <div className="survei-stat">
-              <span className="survei-stat__num">{SURVEI_INFO.length}</span>
+              <span className="survei-stat__num">{jumlahInstrumen}</span>
               <span className="survei-stat__label">Total instrumen</span>
             </div>
             <div className="survei-stat">
@@ -71,14 +79,13 @@ export default function SurveiPage({ onNavigate, onIsiSurvei }) {
               <span className="survei-stat__label">Total responden</span>
             </div>
             <div className="survei-stat">
-              <span className="survei-stat__num">{SURVEI_INFO.length}<span className="survei-stat__sub">/{SURVEI_INFO.length}</span></span>
+              <span className="survei-stat__num">{laporan.ringkasan.totalInstrumen}</span>
               <span className="survei-stat__label">Instrumen aktif</span>
             </div>
             <div className="survei-stat">
-              <span className="survei-stat__num">Agu 2026</span>
+              <span className="survei-stat__num">{laporan.periode.short}</span>
               <span className="survei-stat__label">Periode data</span>
             </div>
-            <span className="chip">Data Simulasi</span>
           </section>
 
           <div className="survei-toolbar">

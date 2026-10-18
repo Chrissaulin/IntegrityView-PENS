@@ -38,7 +38,6 @@ export default function ItemDistributionBar({
       {showName && (
         <span className="idb__name" title={item.namaPanjang || item.nama}>
           {item.nama}
-          {item.sumber === 'simulasi' && <span className="idb__tag">simulasi</span>}
         </span>
       )}
 
@@ -46,7 +45,7 @@ export default function ItemDistributionBar({
         {item.distribusiPersen.map((pct, i) => (
           <span
             key={i}
-            className={`idb__seg ${item.sumber === 'simulasi' ? 'idb__seg--simulasi' : ''}`}
+            className="idb__seg"
             style={{ width: pct + '%', background: SKALA_WARNA[i] }}
             title={`${SKALA_LABEL[i]}: ${formatAngka(pct)}% (n=${item.distribusiAbsolut[i]})`}
           >

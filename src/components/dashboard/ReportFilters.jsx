@@ -1,0 +1,64 @@
+import { useEffect, useRef, useState } from 'react';
+import { PERIODE, PILIHAN_PEMBANDING, PILIHAN_KELOMPOK, PILIHAN_KATEGORI } from '../../data/reportData';
+import InfoTip from './InfoTip';
+import './ReportFilters.css';
+
+export default function ReportFilters({ filter, onChange }) {
+  const [terbuka, setTerbuka] = useState(false);
+  const menuRef = useRef(null);
+  const jumlahAktif = Number(filter.kelompok !== 'Semua') + Number(filter.kategori !== 'Semua');
+  const pilih = (key) => (event) => {
+    const nilai = event.target.value;
+    if (key === 'periode') {
+      onChange({ ...filter, periode: nilai, pembanding: nilai === '2024' ? 'tanpa' : filter.periode === '2024' ? 'sebelumnya' : filter.pembanding });
+    } else onChange({ ...filter, [key]: nilai });
+  };
+  const labelPeriode = PERIODE.find((p) => p.key === filter.periode)?.keterangan;
+
+  useEffect(() => {
+    if (!terbuka) return;
+    const tutupDiLuar = (event) => { if (!menuRef.current?.contains(event.target)) setTerbuka(false); };
+    const tutupEscape = (event) => {
+      if (event.key === 'Escape') {
+        setTerbuka(false);
+        menuRef.current?.querySelector('button')?.focus();
+      }
+    };
+    document.addEventListener('pointerdown', tutupDiLuar);
+    document.addEventListener('keydown', tutupEscape);
+    return () => {
+      document.removeEventListener('pointerdown', tutupDiLuar);
+      document.removeEventListener('keydown', tutupEscape);
+    };
+  }, [terbuka]);
+
+  return (
+    <div className="report-filters" role="group" aria-label="Filter laporan">
+      <select aria-label="Periode" className="report-filters__periode" value={filter.periode} onChange={pilih('periode')}>
+        {PERIODE.map((p) => <option key={p.key} value={p.key}>Periode: {p.label}</option>)}
+      </select>
+      <select aria-label="Bandingkan dengan" className="report-filters__compare" value={filter.pembanding} onChange={pilih('pembanding')} disabled={filter.periode === '2024'}>
+        {PILIHAN_PEMBANDING.map((p) => <option key={p.key} value={p.key}>Bandingkan: {p.label}</option>)}
+      </select>
+      <InfoTip label="Catatan sumber data dan perbandingan" teks={`Tahun dipilih: ${labelPeriode}. Responden tiap tahun berbeda. Selisih skor membandingkan kelompok responden yang berbeda, bukan perubahan pada orang yang sama. Data 2026 masih berjalan. Sebagian data pada prototipe ini berupa simulasi untuk mendemonstrasikan fitur.`} />
+      <div className="report-filters__more" ref={menuRef}>
+        <button type="button" className="report-filters__toggle" aria-expanded={terbuka} aria-controls="report-filters-more" onClick={() => setTerbuka((v) => !v)}>
+          Filter lainnya{jumlahAktif > 0 && <span className="report-filters__count">{jumlahAktif}</span>}
+        </button>
+        {terbuka && <div id="report-filters-more" className="report-filters__popover">
+          <label>Kelompok responden
+            <select value={filter.kelompok} onChange={pilih('kelompok')}>
+              {PILIHAN_KELOMPOK.map((k) => <option key={k}>{k}</option>)}
+            </select>
+          </label>
+          <label>Kategori instrumen
+            <select value={filter.kategori} onChange={pilih('kategori')}>
+              {PILIHAN_KATEGORI.map((k) => <option key={k}>{k}</option>)}
+            </select>
+          </label>
+        </div>}
+      </div>
+      <span className="report-filters__spacer" />
+    </div>
+  );
+}

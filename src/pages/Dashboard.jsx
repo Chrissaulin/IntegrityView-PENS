@@ -2,26 +2,34 @@ import { useEffect, useMemo, useState } from 'react';
 import Sidebar from '../components/layout/Sidebar';
 import Topbar from '../components/layout/Topbar';
 import RingkasanCards from '../components/dashboard/RingkasanCards';
-import SebaranJawabanChart from '../components/dashboard/SebaranJawabanChart';
+import SebaranJawabanChart, { SebaranLegend } from '../components/dashboard/SebaranJawabanChart';
 import StatistikPanel from '../components/dashboard/StatistikPanel';
-import { getRingkasanDashboard, getSebaranPerInstrumen, getUser } from '../data/mock';
+import PeriodHeatmap from '../components/dashboard/PeriodHeatmap';
+import ReportFilters from '../components/dashboard/ReportFilters';
+import { useReportFilters } from '../data/useReportFilters';
+import { getReportData } from '../data/reportData';
+import { getUser } from '../data/mock';
 import './Dashboard.css';
 
 export default function Dashboard({ onBackToLanding, onNavigate, onOpenInstrument }) {
   const user = getUser();
   const [loading, setLoading] = useState(true);
   const [selectedKey, setSelectedKey] = useState(null);
+  const [tab, setTab] = useState('sebaran');
+  const { filter, setFilter } = useReportFilters();
 
-  const ringkasan = useMemo(() => getRingkasanDashboard(), []);
-  const sebaran = useMemo(() => getSebaranPerInstrumen(), []);
+  const laporan = useMemo(() => getReportData(filter), [filter]);
+  const { ringkasan, sebaran } = laporan;
 
   useEffect(() => {
     const t = window.setTimeout(() => {
       setLoading(false);
-      if (sebaran.length) setSelectedKey(sebaran[0].key);
     }, 500);
     return () => window.clearTimeout(t);
-  }, [sebaran]);
+  }, []);
+
+  const aktifKey = laporan.instrumen.some((s) => s.info.key === selectedKey && s.aktif)
+    ? selectedKey : sebaran[0]?.key || null;
 
   const handleMenu = (key) => {
     if (key === 'beranda') {
@@ -32,11 +40,11 @@ export default function Dashboard({ onBackToLanding, onNavigate, onOpenInstrumen
   };
 
   return (
-    <div className="app-shell">
+    <div className="app-shell dashboard-shell">
       <Sidebar active="dashboard" onNavigate={handleMenu} user={user} />
 
       <div className="app-main">
-        <Topbar user={user} notifCount={3} onProfil={() => handleMenu('profil')} />
+         <Topbar compact user={user} notifCount={3} onProfil={() => handleMenu('profil')} />
 
         <main className="app-content">
           {loading ? (
@@ -50,33 +58,32 @@ export default function Dashboard({ onBackToLanding, onNavigate, onOpenInstrumen
             </div>
           ) : (
             <>
-              <RingkasanCards ringkasan={ringkasan} />
+              <div className="dashboard__report">
+               <ReportFilters filter={filter} onChange={setFilter} />
+              <RingkasanCards ringkasan={ringkasan} pembanding={laporan.periodePembanding} />
 
               <div className="dashboard__duo">
                 <section className="dashboard__box dashboard__box--left" aria-labelledby="sebaran-title">
                   <div className="dashboard__box-head">
-                    <div>
-                      <p className="label-eyebrow">Distribusi Jawaban</p>
-                      <h2 className="dashboard__box-title" id="sebaran-title">Sebaran Jawaban per Instrumen</h2>
+                     <h2 className="dashboard__box-title" id="sebaran-title">{tab === 'sebaran' ? 'Sebaran Jawaban per Instrumen' : 'Perubahan Indeks Tahunan'}</h2>
+                     {tab === 'sebaran' && <SebaranLegend />}
+                    <div className="dashboard__tabs" role="group" aria-label="Tampilan grafik">
+                      <button type="button" className={tab === 'sebaran' ? 'is-active' : ''} aria-pressed={tab === 'sebaran'} onClick={() => setTab('sebaran')}>Sebaran</button>
+                      <button type="button" className={tab === 'perubahan' ? 'is-active' : ''} aria-pressed={tab === 'perubahan'} onClick={() => setTab('perubahan')}>Perubahan</button>
                     </div>
                   </div>
-                  <SebaranJawabanChart
+                  {tab === 'sebaran' ? <SebaranJawabanChart
                     data={sebaran}
-                    selectedKey={selectedKey}
+                     selectedKey={aktifKey}
                     onSelect={setSelectedKey}
                     onOpenDetail={onOpenInstrument}
-                  />
+                  /> : <PeriodHeatmap instrumen={laporan.instrumen} periode={filter.periode} selectedKey={aktifKey} onSelect={setSelectedKey} tampilkanSelisih={laporan.periodePembanding != null} />}
                 </section>
 
-                <section className="dashboard__box dashboard__box--right" aria-labelledby="statistik-title">
-                  <div className="dashboard__box-head">
-                    <div>
-                      <p className="label-eyebrow">Analisis</p>
-                      <h2 className="dashboard__box-title" id="statistik-title">Ringkasan Statistik & Rekomendasi</h2>
-                    </div>
-                  </div>
-                  <StatistikPanel selectedKey={selectedKey} onOpenDetail={onOpenInstrument} />
+                 <section className="dashboard__box dashboard__box--right" aria-label="Instrumen terpilih">
+                  <StatistikPanel selectedKey={aktifKey} onOpenDetail={onOpenInstrument} laporan={laporan} />
                 </section>
+              </div>
               </div>
             </>
           )}

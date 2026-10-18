@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import './SebaranJawabanChart.css';
 import { formatAngka } from '../../data/mock';
+import Delta from './Delta';
 
 const SKALA = [
   { label: 'Sangat Tidak Setuju', short: 'STS', color: '#C25E1E' },
@@ -9,10 +10,26 @@ const SKALA = [
   { label: 'Sangat Setuju', short: 'SS', color: '#0B1B33' }
 ];
 
-const MIN_LABEL_PCT = 7;
+export function SebaranLegend() {
+  return <div className="sebaran__legend" aria-label="Skala jawaban Likert">
+    {SKALA.map((s, i) => <span key={s.short} className="sebaran__legend-item" title={s.label}>
+      <span className="sebaran__legend-swatch" style={{ backgroundColor: s.color }} />{i + 1} {s.short}
+    </span>)}
+  </div>;
+}
 
 export default function SebaranJawabanChart({ data, selectedKey, onSelect, onOpenDetail }) {
   const [tooltip, setTooltip] = useState(null);
+  const [barWidth, setBarWidth] = useState(0);
+  const innerRef = useRef(null);
+
+  useEffect(() => {
+    const bar = innerRef.current?.querySelector('.sebaran__bar');
+    if (!bar) return;
+    const ro = new ResizeObserver(() => setBarWidth(bar.getBoundingClientRect().width));
+    ro.observe(bar);
+    return () => ro.disconnect();
+  }, [data]);
 
   if (!data || !data.length) {
     return (
@@ -34,16 +51,7 @@ export default function SebaranJawabanChart({ data, selectedKey, onSelect, onOpe
 
   return (
     <div className="sebaran">
-      <div className="sebaran__legend">
-        {SKALA.map((s, i) => (
-          <span key={s.short} className="sebaran__legend-item">
-            <span className="sebaran__legend-swatch" style={{ background: s.color }} />
-            {i + 1} · {s.label}
-          </span>
-        ))}
-      </div>
-
-      <div className="sebaran__inner" onMouseLeave={() => setTooltip(null)}>
+      <div className="sebaran__inner" ref={innerRef} onMouseLeave={() => setTooltip(null)}>
         {data.map((item) => {
           const isSelected = item.key === selectedKey;
           return (
@@ -55,27 +63,20 @@ export default function SebaranJawabanChart({ data, selectedKey, onSelect, onOpe
               aria-pressed={isSelected}
               aria-label={`Pilih ${item.namaPanjang}, ${formatAngka(item.persenSetuju)} persen setuju`}
             >
-              <span className="sebaran__name">
-                {item.nama}
-                {item.sumber === 'simulasi' && (
-                  <span className="sebaran__tag">simulasi</span>
-                )}
-              </span>
+              <span className="sebaran__name">{item.nama}</span>
 
               <span className="sebaran__bar" role="img" aria-label={`Sebaran jawaban ${item.nama}`}>
                 {item.distribusiPersen.map((pct, i) => {
-                  const abs = item.distribusiAbsolut[i];
                   return (
                     <span
                       key={i}
-                      className={`sebaran__seg ${item.sumber === 'simulasi' ? 'sebaran__seg--simulasi' : ''}`}
-                      style={{ width: pct + '%', background: SKALA[i].color }}
+                      className="sebaran__seg"
+                      style={{ width: pct + '%', backgroundColor: SKALA[i].color }}
                       onMouseMove={(e) => showTip(e, item, i)}
                     >
-                      {pct >= MIN_LABEL_PCT && (
+                      {barWidth * pct / 100 >= 40 && (
                         <span className="sebaran__seg-label">{formatAngka(pct, 0)}%</span>
                       )}
-                      {abs === 0 && null}
                     </span>
                   );
                 })}
@@ -84,6 +85,7 @@ export default function SebaranJawabanChart({ data, selectedKey, onSelect, onOpe
               <span className="sebaran__pct">
                 {formatAngka(item.persenSetuju)}%
               </span>
+              <Delta value={item.delta} compact />
 
               {onOpenDetail && (
                 <span
@@ -129,9 +131,6 @@ export default function SebaranJawabanChart({ data, selectedKey, onSelect, onOpe
         )}
       </div>
 
-      <p className="sebaran__note">
-        Diurutkan dari persentase Setuju + Sangat Setuju terendah. Klik batang untuk melihat statistik instrumen.
-      </p>
     </div>
   );
 }

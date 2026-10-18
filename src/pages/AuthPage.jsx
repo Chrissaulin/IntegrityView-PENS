@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { BlobDecor } from '../components/cards/StatCard';
-import { RINGKASAN, ROLES, loginAs } from '../data/mock';
+import { ROLES, loginAs, formatAngka } from '../data/mock';
+import { getReportData } from '../data/reportData';
+import { useReportFilters } from '../data/useReportFilters';
 import './AuthPage.css';
 
 const UNIT_OPTIONS = [
@@ -22,6 +24,8 @@ const UNIT_OPTIONS = [
 const EMAIL_RE = /^[^\s@]+@pens\.ac\.id$/i;
 
 export default function AuthPage({ onSuccess, onBack }) {
+  const { filter } = useReportFilters();
+  const ringkasan = getReportData({ ...filter, kategori: 'Semua' }).ringkasan;
   const [mode, setMode] = useState('login'); // 'login' | 'register'
   const [showSuccess, setShowSuccess] = useState(false);
   const [loginRole, setLoginRole] = useState('sivitas');
@@ -93,15 +97,15 @@ export default function AuthPage({ onSuccess, onBack }) {
 
           <div className="auth__brand-stats">
             <div className="auth__brand-stat">
-              <span className="auth__brand-stat-num">{RINGKASAN.rataSkor}%</span>
-              <span className="auth__brand-stat-label">Skor ZI bulan ini</span>
+              <span className="auth__brand-stat-num">{formatAngka(ringkasan.rataSkor)}%</span>
+              <span className="auth__brand-stat-label">Skor ZI periode ini</span>
             </div>
             <div className="auth__brand-stat">
-              <span className="auth__brand-stat-num">{RINGKASAN.totalResponden}+</span>
+              <span className="auth__brand-stat-num">{ringkasan.responden.total.toLocaleString('id-ID')}</span>
               <span className="auth__brand-stat-label">Responden aktif</span>
             </div>
             <div className="auth__brand-stat">
-              <span className="auth__brand-stat-num">{RINGKASAN.instrumenAktif}/10</span>
+              <span className="auth__brand-stat-num">{ringkasan.totalInstrumen}</span>
               <span className="auth__brand-stat-label">Instrumen berjalan</span>
             </div>
           </div>

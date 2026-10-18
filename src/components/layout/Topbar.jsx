@@ -11,7 +11,7 @@ function formatJam(d) {
   return `${p(d.getHours())}.${p(d.getMinutes())}`;
 }
 
-export default function Topbar({ user, notifCount = 3, onSearch, onProfil, showSearch = true }) {
+export default function Topbar({ user, notifCount = 3, onSearch, onProfil, showSearch = true, compact = false }) {
   const [now, setNow] = useState(() => new Date());
   const [query, setQuery] = useState('');
 
@@ -21,13 +21,12 @@ export default function Topbar({ user, notifCount = 3, onSearch, onProfil, showS
   }, []);
 
   return (
-    <header className="topbar">
+    <header className={`topbar ${compact ? 'topbar--compact' : ''}`}>
       <div className="topbar__left">
         <p className="topbar__greeting">
           Hai, {user?.nama?.split(' ')[0] || 'Pengunjung'}
-          <span className="topbar__wave" aria-hidden="true">👋</span>
         </p>
-        <p className="topbar__sub">Berikut ringkasan integritas kampus hari ini.</p>
+        {!compact && <p className="topbar__sub">Berikut ringkasan integritas kampus hari ini.</p>}
       </div>
 
       <div className="topbar__center">
@@ -52,14 +51,6 @@ export default function Topbar({ user, notifCount = 3, onSearch, onProfil, showS
       </div>
 
       <div className="topbar__right">
-        <span className="chip" title="Periode survei yang sedang berjalan">
-          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <rect x="3" y="5" width="18" height="16" rx="2" />
-            <path d="M8 3v4M16 3v4M3 11h18" />
-          </svg>
-          Periode aktif: Mar–Agu 2026
-        </span>
-
         <div className="topbar__clock" aria-label="Waktu saat ini">
           <span className="topbar__clock-time">{formatJam(now)}</span>
           <span className="topbar__clock-date">{formatTanggal(now)}</span>

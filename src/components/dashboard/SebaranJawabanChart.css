@@ -1,26 +1,27 @@
 .sebaran {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  min-height: 0;
   height: 100%;
 }
 
 .sebaran__legend {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px 18px;
+  flex-wrap: nowrap;
+  gap: 10px;
   font-size: 12px;
   color: var(--text-secondary);
+  white-space: nowrap;
 }
 .sebaran__legend-item {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 4px;
   font-weight: 600;
 }
 .sebaran__legend-swatch {
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   border-radius: 3px;
   display: inline-block;
 }
@@ -29,17 +30,22 @@
   position: relative;
   display: flex;
   flex-direction: column;
+  flex: 1;
+  min-height: 0;
   gap: 4px;
 }
 
 .sebaran__row {
   display: grid;
-  grid-template-columns: 130px 1fr 56px auto;
-  gap: 10px;
+  grid-template-columns: 105px minmax(0, 1fr) 54px 46px 24px;
+  gap: 8px;
   align-items: center;
-  padding: 7px 10px;
-  border-radius: 10px;
-  border: 2px solid transparent;
+  flex: 1 1 0;
+  min-height: 32px;
+  max-height: 44px;
+  padding: 2px 6px;
+  border-radius: 8px;
+  border: 1px solid transparent;
   text-align: left;
   transition: background 0.12s ease, border-color 0.12s ease;
 }
@@ -54,30 +60,18 @@
 }
 
 .sebaran__name {
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--text-primary);
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  line-height: 1.25;
-}
-.sebaran__tag {
-  align-self: flex-start;
-  font-size: 9.5px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-  background: var(--gray-50);
-  border: 1px solid var(--border-soft);
-  padding: 1px 6px;
-  border-radius: 4px;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .sebaran__bar {
   display: flex;
-  height: 26px;
+  height: 18px;
   width: 100%;
   overflow: hidden;
   border-radius: 4px;
@@ -92,16 +86,8 @@
 }
 .sebaran__seg:hover { filter: brightness(1.1); }
 
-.sebaran__seg--simulasi {
-  background-image: repeating-linear-gradient(
-    -45deg,
-    rgba(255, 255, 255, 0.22) 0 3px,
-    transparent 3px 7px
-  );
-}
-
 .sebaran__seg-label {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 800;
   color: #fff;
   font-variant-numeric: tabular-nums;
@@ -117,18 +103,24 @@
 }
 
 .sebaran__open {
-  width: 26px;
-  height: 26px;
+  width: 24px;
+  height: 24px;
   border-radius: 8px;
   display: grid;
   place-items: center;
   color: var(--text-secondary);
-  border: 1px solid var(--border-soft);
-  background: var(--white);
+  border: 0;
+  background: transparent;
   cursor: pointer;
-  transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s ease, color 0.12s ease;
   flex-shrink: 0;
 }
+.sebaran__row:hover .sebaran__open,
+.sebaran__row.is-selected .sebaran__open,
+.sebaran__open:focus-visible { opacity: 1; pointer-events: auto; }
+.sebaran__open:focus-visible { outline: 2px solid var(--orange-500); }
 .sebaran__open:hover {
   background: var(--navy-900);
   border-color: var(--navy-900);
@@ -152,16 +144,8 @@
 }
 .sebaran__tooltip strong { font-size: 12.5px; }
 .sebaran__tooltip-note {
-  font-size: 11px;
-  opacity: 0.7;
-}
-
-.sebaran__note {
   font-size: 12px;
-  color: var(--text-secondary);
-  padding-top: 10px;
-  border-top: 1px solid var(--border-soft);
-  margin-top: auto;
+  opacity: 0.7;
 }
 
 .sebaran--empty {
@@ -174,10 +158,9 @@
 
 @media (max-width: 720px) {
   .sebaran__row {
-    grid-template-columns: 92px 1fr 48px auto;
-    gap: 8px;
-    padding: 6px 6px;
+    grid-template-columns: 72px minmax(0, 1fr) 48px 40px 24px;
+    gap: 4px;
   }
-  .sebaran__name { font-size: 11.5px; }
+  .sebaran__name { font-size: 12px; }
   .sebaran__seg-label { display: none; }
 }

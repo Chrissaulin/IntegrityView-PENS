@@ -145,7 +145,7 @@
 /* === Grid kartu instrumen === */
 .survei-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--gap-grid);
 }
 
@@ -194,6 +194,7 @@
 }
 .scard__meta {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   font-size: 12px;
   color: var(--text-secondary);
@@ -215,9 +216,23 @@
   border-radius: var(--radius-card);
 }
 
+@media (min-width: 1280px) {
+  .survei-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .scard { padding: 18px 16px; }
+  .scard__top { flex-wrap: wrap; }
+}
+
 @media (max-width: 900px) {
   .survei-hero { grid-template-columns: 1fr; gap: 20px; padding: 22px; }
   .survei-stats { gap: 20px; padding: 16px 20px; }
   .survei-toolbar { flex-direction: column; align-items: stretch; }
   .survei-toolbar .btn { justify-content: center; }
+}
+
+@media (max-width: 700px) {
+  .survei-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 540px) {
+  .survei-grid { grid-template-columns: 1fr; }
 }

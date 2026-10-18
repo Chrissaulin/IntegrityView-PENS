@@ -1,0 +1,53 @@
+.report-filters {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 40px;
+  min-height: 0;
+  min-width: 0;
+  white-space: nowrap;
+}
+.report-filters select, .report-filters__toggle {
+  height: 36px;
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.report-filters > select { padding: 0 10px; flex-shrink: 0; }
+.report-filters__periode { width: 205px; }
+.report-filters__compare { width: 245px; }
+.report-filters > select:disabled { opacity: 1; color: var(--text-secondary); background: var(--gray-50); cursor: not-allowed; }
+.report-filters__more { position: relative; flex-shrink: 0; }
+.report-filters__toggle { display: flex; align-items: center; gap: 8px; padding: 0 12px; }
+.report-filters__count { background: var(--orange-100); color: var(--navy-900); min-width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; }
+.report-filters__popover {
+  position: absolute;
+  z-index: 60;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 244px;
+  padding: 14px;
+  background: var(--white);
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  box-shadow: var(--shadow-hover);
+  display: grid;
+  gap: 12px;
+}
+.report-filters__popover label { display: grid; gap: 5px; color: var(--text-secondary); font-size: 12px; font-weight: 700; }
+.report-filters__popover select { width: 100%; padding: 0 8px; }
+.report-filters__spacer { flex: 1; min-width: 0; }
+.report-filters select:focus-visible, .report-filters__toggle:focus-visible { outline: 2px solid var(--orange-500); outline-offset: 1px; }
+@media (max-width: 720px) {
+  .report-filters { gap: 5px; }
+  .report-filters__periode, .report-filters__compare { flex: 1 1 0; width: 0; }
+  .report-filters > select { padding: 0 2px; font-size: 11px; }
+  .report-filters__toggle { padding: 0 5px; font-size: 11px; }
+  .report-filters__spacer { display: none; }
+  .report-filters__popover { left: auto; right: 0; }
+}

@@ -1,0 +1,8 @@
+.period-trend { flex: 0 0 auto; width: 100%; min-width: 0; }
+.period-trend svg { display: block; width: 100%; max-height: 170px; overflow: visible; }
+.period-trend text { font: 10px var(--font-family); fill: var(--text-secondary); }
+.period-trend__guide { stroke: var(--border-soft); stroke-width: 1; }
+.period-trend__line { stroke: var(--navy-900); stroke-width: 2; }
+.period-trend__ci { stroke: var(--orange-500); stroke-width: 4; opacity: 0.6; }
+.period-trend__point { fill: var(--navy-900); }
+.period-trend__selected { fill: var(--orange-500); stroke: var(--navy-900); stroke-width: 2; }

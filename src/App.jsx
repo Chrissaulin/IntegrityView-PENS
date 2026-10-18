@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import LandingPage from './pages/LandingPage';
 import AuthPage from './pages/AuthPage';
 import Dashboard from './pages/Dashboard';
@@ -14,9 +14,31 @@ import Topbar from './components/layout/Topbar';
 import { getUser, getSession, logout } from './data/mock';
 
 export default function App() {
-  const [page, setPage] = useState('landing'); // 'landing' | 'auth' | 'dashboard' | 'survei' | 'survei-form' | 'instrumen-detail' | 'pengaduan' | 'kelola-pengaduan' | 'laporan'
+  const [page, setPage] = useState(() => {
+    const halaman = new URLSearchParams(window.location.search).get('page');
+    return ['dashboard', 'instrumen-detail'].includes(halaman) ? halaman : 'landing';
+  });
   const [surveiKey, setSurveiKey] = useState(null);
-  const [instrumenSlug, setInstrumenSlug] = useState(null);
+  const [instrumenSlug, setInstrumenSlug] = useState(() => new URLSearchParams(window.location.search).get('instrumen'));
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (page === 'dashboard' || page === 'instrumen-detail') params.set('page', page);
+    else params.delete('page');
+    if (page === 'instrumen-detail' && instrumenSlug) params.set('instrumen', instrumenSlug);
+    else params.delete('instrumen');
+    window.history.replaceState(null, '', `${window.location.pathname}?${params}${window.location.hash}`);
+  }, [page, instrumenSlug]);
+
+  useEffect(() => {
+    const sync = () => {
+      const params = new URLSearchParams(window.location.search);
+      setPage(params.get('page') || 'landing');
+      setInstrumenSlug(params.get('instrumen'));
+    };
+    window.addEventListener('popstate', sync);
+    return () => window.removeEventListener('popstate', sync);
+  }, []);
 
   const session = getSession();
   const role = session ? session.role : 'guest';

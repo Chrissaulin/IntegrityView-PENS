@@ -1,0 +1,4 @@
+.delta { font-size: 12px; font-weight: 800; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.delta--up { color: var(--teal-500); }
+.delta--down { color: var(--error-500); }
+.delta--flat { color: var(--text-secondary); }

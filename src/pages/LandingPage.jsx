@@ -1,17 +1,56 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { BlobDecor } from '../components/cards/StatCard';
-import { RINGKASAN, SURVEI_LANDING, KATEGORI_SKOR, RENTANG_SKOR, KONTAK, labelPartisipan } from '../data/mock';
+import { KONTAK, labelPartisipan, formatAngka } from '../data/mock';
+import { getReportData } from '../data/reportData';
+import { useReportFilters } from '../data/useReportFilters';
+import Delta from '../components/dashboard/Delta';
 import './LandingPage.css';
 
 const ALUR = [
-    { n: 1, judul: 'Isi Survei / Lapor Aduan', desc: 'Dosen dan tenaga kependidikan mengisi instrumen atau menyampaikan laporan lewat kanal resmi. Bisa anonim penuh.' },
+  { n: 1, judul: 'Isi Survei / Lapor Aduan', desc: 'Dosen dan tenaga kependidikan mengisi instrumen atau menyampaikan laporan lewat kanal resmi. Bisa anonim penuh.' },
   { n: 2, judul: 'Data Masuk Otomatis', desc: 'Respons terverifikasi Unit Penjaminan Mutu dan langsung tercatat di sistem.' },
   { n: 3, judul: 'Dianalisis Tim SPI', desc: 'Satuan Pengawasan Internal menghitung skor indeks dan menelaah temuan.' },
   { n: 4, judul: 'Ditindaklanjuti & Dipublikasi', desc: 'Hasil tampil di dashboard publik dan rekomendasi diteruskan ke unit terkait.' }
 ];
 
+/* Gradasi latar per langkah, arah seragam 135deg, satu keluarga warna tema:
+   1) navy tua -> biru tua   2) biru tua -> biru muda
+   3) biru muda -> oranye muda   4) oranye muda -> oranye
+   Langkah 1-2 berlatar gelap (teks putih, nomor oranye solid);
+   langkah 3-4 berlatar terang (teks navy, nomor navy solid). */
+const ALUR_GRADIENTS = [
+  { bg: 'linear-gradient(135deg, #0B1B33 0%, #14294A 100%)', numBg: '#F5843C', numColor: '#0B1B33', textColor: '#FFFFFF', descColor: 'rgba(241,244,249,0.78)' },
+  { bg: 'linear-gradient(135deg, #14294A 0%, #2E5F9E 100%)', numBg: '#F5843C', numColor: '#0B1B33', textColor: '#FFFFFF', descColor: 'rgba(241,244,249,0.78)' },
+  { bg: 'linear-gradient(135deg, #8FB6E0 0%, #F6D3B4 100%)', numBg: '#0B1B33', numColor: '#FFFFFF', textColor: '#0B1B33', descColor: 'rgba(11,27,51,0.72)' },
+  { bg: 'linear-gradient(135deg, #FDDFC8 0%, #F5843C 100%)', numBg: '#0B1B33', numColor: '#FFFFFF', textColor: '#0B1B33', descColor: 'rgba(11,27,51,0.72)' },
+];
+
+/* Langkah ke-5 dan seterusnya (bila ALUR bertambah) meneruskan gradasi
+   dengan interpolasi warna pada arah yang sama. */
+function gradientLangkah(i) {
+  const dasar = ALUR_GRADIENTS;
+  if (i < dasar.length) return dasar[i];
+  const dari = dasar[dasar.length - 2];
+  const ke = dasar[dasar.length - 1];
+  const campur = Math.min(1, (i - dasar.length + 2) / 2);
+  return {
+    bg: `linear-gradient(135deg, ${ke.bg.match(/#[0-9A-Fa-f]{6}/)[0]} 0%, ${campur > 0.5 ? '#F5843C' : dari.bg.match(/#[0-9A-Fa-f]{6}/)[0]} 100%)`,
+    numBg: ke.numBg,
+    numColor: ke.numColor,
+    textColor: ke.textColor,
+    descColor: ke.descColor
+  };
+}
+
 export default function LandingPage({ onEnterDashboard, session }) {
   const [scrollY, setScrollY] = useState(0);
+  const { filter } = useReportFilters();
+  const laporan = useMemo(() => getReportData({ ...filter, kategori: 'Semua' }), [filter]);
+  const ringkasan = laporan.ringkasan;
+  const ringkasanResponden = ringkasan.responden.total;
+  const surveiLanding = laporan.instrumen.filter((s) => s.aktif).map((s) => ({ ...s.info, responden: s.aktif.jumlahResponden }));
+  const kategoriSkor = laporan.kategoriSkor;
+  const { naik, turun } = laporan.perubahanTerbesar;
 
   useEffect(() => {
     const fn = () => setScrollY(window.scrollY);
@@ -56,7 +95,7 @@ export default function LandingPage({ onEnterDashboard, session }) {
               Capaian integritas kampus, terbuka untuk diperiksa siapa saja.
             </h1>
             <p className="landing__hero-lead">
-              Platform ini menyatukan sepuluh instrumen survei, dashboard analitik publik, dan kanal pengaduan dalam satu alamat. Pimpinan dan assessor membaca data tanpa menunggu laporan manual.
+              Platform ini menyatukan {ringkasan.totalInstrumen} instrumen survei, dashboard analitik publik, dan kanal pengaduan dalam satu alamat. Pimpinan dan assessor membaca data tanpa menunggu laporan manual.
             </p>
             <div className="landing__hero-cta">
               <button type="button" className="btn btn-primary" onClick={onEnterDashboard}>
@@ -74,21 +113,21 @@ export default function LandingPage({ onEnterDashboard, session }) {
 
             <div className="landing__bento landing__bento--a" style={{ transform: `translateY(${-parallax}px)` }}>
               <BlobDecor color="#0B1B33" />
-              <p className="label-eyebrow">Skor ZI bulan ini</p>
-              <div className="landing__bento-value">{RINGKASAN.rataSkor}<span>%</span></div>
-              <span className="badge badge-up">↑ 0,3 vs Jul</span>
+              <p className="label-eyebrow">Skor ZI {laporan.periode.short}</p>
+              <div className="landing__bento-value">{formatAngka(ringkasan.rataSkor)}<span>%</span></div>
+              <Delta value={ringkasan.delta} />
             </div>
 
             <div className="landing__bento landing__bento--b" style={{ transform: `translateY(${parallax * 1.4}px)` }}>
               <BlobDecor color="#FFFFFF" />
               <p className="label-eyebrow" style={{ color: 'rgba(241,244,249,0.7)' }}>Responden</p>
-              <div className="landing__bento-value" style={{ color: '#fff' }}>{RINGKASAN.totalResponden}<span style={{ color: 'rgba(241,244,249,0.7)' }}>+</span></div>
-              <span className="landing__bento-note">Naik 12% dari periode lalu</span>
+              <div className="landing__bento-value" style={{ color: '#fff' }}>{ringkasan.responden.total.toLocaleString('id-ID')}</div>
+              <span className="landing__bento-note">{laporan.periode.short}</span>
             </div>
 
             <div className="landing__bento landing__bento--c" style={{ transform: `translateY(${-parallax * 0.7}px)` }}>
               <p className="label-eyebrow" style={{ color: 'rgba(11,27,51,0.6)' }}>Instrumen aktif</p>
-              <div className="landing__bento-value">{RINGKASAN.instrumenAktif}<span>/10</span></div>
+              <div className="landing__bento-value">{ringkasan.totalInstrumen}</div>
               <div className="landing__bento-bars">
                 <span style={{ height: '40%' }} />
                 <span style={{ height: '60%' }} />
@@ -127,62 +166,51 @@ export default function LandingPage({ onEnterDashboard, session }) {
             <p className="label-eyebrow">Statistik Ringkas</p>
             <h2 className="landing__section-title">Skor per kategori instrumen.</h2>
           </div>
-          <span className="chip">Data Simulasi</span>
         </div>
 
         <div className="landing__stats-grid">
-          {KATEGORI_SKOR.map(k => (
+          {kategoriSkor.map(k => (
             <article key={k.kategori} className="landing__stat-card">
               <BlobDecor color="#0B1B33" />
               <p className="label-eyebrow">{k.kategori}</p>
               <div className="landing__stat-num">{k.skor.toFixed(1).replace('.', ',')}<span className="landing__stat-unit">%</span></div>
               <p className="landing__stat-label">
-                <span className={`badge ${k.tren === 'naik' ? 'badge-up' : 'badge-flat'}`}>
-                  {k.tren === 'naik' ? '↑ Tren naik' : '→ Tren datar'}
-                </span>
+                 <Delta value={k.delta} />
               </p>
             </article>
           ))}
 
-          {/* Kartu Rentang Skor Instrumen — menggantikan tren bulanan */}
-          {RENTANG_SKOR && (
+           {naik && turun && (
             <article className="landing__stat-card landing__stat-card--peach">
               <BlobDecor color="#FFFFFF" />
-              <p className="label-eyebrow" style={{ color: 'rgba(255,255,255,0.72)' }}>Rentang Skor Instrumen</p>
+               <p className="label-eyebrow" style={{ color: 'rgba(255,255,255,0.72)' }}>Perubahan Terbesar</p>
 
               <div className="landing__rentang">
                 {/* Baris tertinggi */}
                 <div className="landing__rentang-row">
                   <div className="landing__rentang-left">
-                    <span className="landing__rentang-tag landing__rentang-tag--high">Tertinggi</span>
+                     <span className="landing__rentang-tag landing__rentang-tag--high">Kenaikan</span>
                     <span className="landing__rentang-nama">
-                      {RENTANG_SKOR.tertinggi.nama}
-                      {RENTANG_SKOR.tertinggi.sumber === 'simulasi' && (
-                        <span className="landing__rentang-sim">sim</span>
-                      )}
+                       {naik.info.nama}
                     </span>
                   </div>
-                  <span className="landing__rentang-skor">{RENTANG_SKOR.tertinggi.skor.toFixed(1).replace('.', ',')}%</span>
+                   <span className="landing__rentang-skor">{naik.delta > 0 ? '+' : ''}{formatAngka(naik.delta)} poin</span>
                 </div>
 
                 {/* Baris terendah */}
                 <div className="landing__rentang-row">
                   <div className="landing__rentang-left">
-                    <span className="landing__rentang-tag landing__rentang-tag--low">Terendah</span>
+                     <span className="landing__rentang-tag landing__rentang-tag--low">Penurunan</span>
                     <span className="landing__rentang-nama">
-                      {RENTANG_SKOR.terendah.nama}
-                      {RENTANG_SKOR.terendah.sumber === 'simulasi' && (
-                        <span className="landing__rentang-sim">sim</span>
-                      )}
+                       {turun.info.nama}
                     </span>
                   </div>
-                  <span className="landing__rentang-skor">{RENTANG_SKOR.terendah.skor.toFixed(1).replace('.', ',')}%</span>
+                   <span className="landing__rentang-skor">{turun.delta > 0 ? '+' : ''}{formatAngka(turun.delta)} poin</span>
                 </div>
 
                 {/* Selisih */}
                 <div className="landing__rentang-selisih">
-                  <span>Selisih</span>
-                  <strong>{RENTANG_SKOR.selisih.toFixed(1).replace('.', ',')} poin</strong>
+                   <span>vs {laporan.periodePembanding?.short}</span>
                 </div>
               </div>
             </article>
@@ -194,12 +222,11 @@ export default function LandingPage({ onEnterDashboard, session }) {
         <div className="landing__section-head">
           <div>
             <p className="label-eyebrow">Pusat Survei</p>
-            <h2 className="landing__section-title">Sepuluh instrumen integritas.</h2>
+             <h2 className="landing__section-title">{ringkasan.totalInstrumen} instrumen integritas.</h2>
           </div>
-          <span className="chip">Data Simulasi</span>
         </div>
         <div className="landing__instr-grid">
-          {SURVEI_LANDING.map(s => (
+           {surveiLanding.map(s => (
             <button type="button" key={s.key} className="landing__instr-card" onClick={onEnterDashboard}>
               <span className="landing__instr-chevron" aria-hidden="true">
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -277,20 +304,23 @@ export default function LandingPage({ onEnterDashboard, session }) {
             <h2 className="landing__section-title">Dari pengisian sampai publikasi.</h2>
           </div>
         </div>
-        <ol className="landing__alur-list">
-          {ALUR.map((a, i) => (
-            <li key={a.n} className="landing__alur-step">
-              <div className="landing__alur-num">{a.n}</div>
-              <h3 className="landing__alur-judul">{a.judul}</h3>
-              <p className="landing__alur-desc">{a.desc}</p>
+      <ol className="landing__alur-list">
+        {ALUR.map((a, i) => {
+          const g = gradientLangkah(i);
+          return (
+            <li key={a.n} className="landing__alur-step" style={{ background: g.bg }}>
+              <div className="landing__alur-num" style={{ background: g.numBg, color: g.numColor }}>{a.n}</div>
+              <h3 className="landing__alur-judul" style={{ color: g.textColor }}>{a.judul}</h3>
+              <p className="landing__alur-desc" style={{ color: g.descColor }}>{a.desc}</p>
               {i < ALUR.length - 1 && (
                 <svg className="landing__alur-arrow" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <path d="M5 12h14M13 6l6 6-6 6" />
                 </svg>
               )}
             </li>
-          ))}
-        </ol>
+          );
+        })}
+      </ol>
       </section>
 
       <section className="landing__cta-band">
@@ -302,14 +332,9 @@ export default function LandingPage({ onEnterDashboard, session }) {
               Terbuka untuk <strong>dosen dan tenaga kependidikan</strong> PENS.
               Pengisian hanya <strong>± 5 menit</strong> per instrumen, respons anonim dan langsung masuk dashboard publik.
             </p>
-            <div className="landing__cta-target">
-              <div className="landing__cta-target-bar" role="progressbar" aria-valuenow={RINGKASAN.totalResponden} aria-valuemin="0" aria-valuemax="1000">
-                <span style={{ width: (RINGKASAN.totalResponden / 1000) * 100 + '%' }} />
-              </div>
-              <span className="landing__cta-target-label">
-                <strong>{RINGKASAN.totalResponden}</strong> / 1000 responden semester ini
-              </span>
-            </div>
+            <p className="landing__cta-partisipan">
+              <strong className="landing__cta-partisipan-n">{ringkasanResponden.toLocaleString('id-ID')}</strong> responden telah berpartisipasi
+            </p>
           </div>
           <button type="button" className="btn btn-ghost-light landing__cta-btn" onClick={onEnterDashboard}>
             Mulai Isi Survei
@@ -327,8 +352,7 @@ export default function LandingPage({ onEnterDashboard, session }) {
               <span className="landing__brand-mark">IV</span>
               <span className="landing__brand-name">IntegrityView</span>
             </div>
-            <p>Platform Analitik Zona Integritas PENS, dikelola oleh {KONTAK.unit}. Seluruh angka pada prototype ini adalah data simulasi.</p>
-            <span className="chip" style={{ marginTop: 12 }}>Data Simulasi</span>
+             <p>Platform Analitik Zona Integritas PENS, dikelola oleh {KONTAK.unit}.</p>
           </div>
 
           <div className="landing__footer-col">
@@ -380,7 +404,7 @@ export default function LandingPage({ onEnterDashboard, session }) {
           </div>
         </div>
         <div className="landing__footer-bottom">
-          <span>IntegrityView, prototype v3 — September 2026.</span>
+           <span>IntegrityView, prototipe v3 · 2026.</span>
           <span>Politeknik Elektronika Negeri Surabaya · Zona Integritas</span>
         </div>
       </footer>

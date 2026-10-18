@@ -2,7 +2,6 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--gap-grid);
-  margin-bottom: var(--gap-grid);
 }
 
 .rcard {
@@ -10,14 +9,20 @@
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-soft);
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  height: 76px;
+  min-width: 0;
+  padding: 8px 16px;
+  display: grid;
+  grid-template-rows: 22px minmax(0, 1fr);
+  gap: 1px;
 }
+.rcard__top, .rcard__main { display: flex; align-items: center; justify-content: space-between; min-width: 0; gap: 10px; }
+.rcard__main { justify-content: flex-start; }
+.rcard__delta { font-size: 12px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rcard__delta .delta { font-size: 12px; }
 
 .rcard__eyebrow {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -26,7 +31,7 @@
 
 .rcard__num {
   font-family: var(--font-display);
-  font-size: clamp(34px, 3.6vw, 46px);
+  font-size: clamp(28px, 2vw, 32px);
   font-weight: 800;
   letter-spacing: -0.03em;
   line-height: 1;
@@ -34,41 +39,10 @@
   font-variant-numeric: tabular-nums;
 }
 .rcard__unit {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
   color: var(--text-secondary);
   margin-left: 2px;
-}
-
-.rcard__detail {
-  list-style: none;
-  padding: 0;
-  margin: 4px 0 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.rcard__detail li {
-  display: grid;
-  grid-template-columns: 130px 1fr;
-  gap: 10px;
-  font-size: 13px;
-  color: var(--text-primary);
-  line-height: 1.45;
-}
-.rcard__detail-key {
-  font-weight: 700;
-  color: var(--text-secondary);
-  font-size: 12px;
-}
-
-.rcard__sub {
-  margin-top: auto;
-  padding-top: 12px;
-  border-top: 1px solid var(--border-soft);
-  font-size: 12px;
-  color: var(--text-secondary);
-  line-height: 1.5;
 }
 
 @media (max-width: 1100px) {
